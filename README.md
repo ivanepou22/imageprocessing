@@ -1,5 +1,19 @@
 # Image Processing Api
 
+This Image processing API serves two purses:
+
+```bash
+
+```
+
+1.  It's used as a simple placeholder api, it allows users to query images from the server with the image name, width and height specified as parameters on the URL as seen below.
+
+```bash
+    http://localhost:5000/api/v1/images?filename=fjord&width=200&height=200
+```
+
+2.  Second, this api can also be used to properly scale your images or resize your images based on the url parameters specified.
+
 ## Project setup
 
 First, clone this repo and switch into the repo folder:
@@ -39,3 +53,8 @@ npm run test
 ```bash
 npm run start
 ```
+
+### sample tests
+
+1. should send the resized image if it exists in the "images/thumb" folder.
+2. should send a 404 error if the original image does not exist in the "images/full" folder.
