@@ -36,7 +36,7 @@ const imageMiddleware = async (
       await resizeImage(filename, width, height, res);
     } catch (error) {
       // The original image does not exist, so return an error to the client
-      res.status(404).send('Image not found');
+      res.status(404);
     }
   }
 };
@@ -47,6 +47,7 @@ const resizeImage = async (
   imageHeight: number,
   res: Response
 ) => {
+  console.log('Here we go');
   const filePath: string = `${__dirname}/../images/full/${filename}.jpg`;
   const resizedFilePath: string = `${__dirname}/../images/thumb/${filename}_${imageWidth}x${imageHeight}.jpg`;
 
