@@ -30,6 +30,12 @@ Now you need to install the dependencies for the server code.
 npm install
 ```
 
+### Now that everything is set up, you can test the app by starting the server using nodemon
+
+```bash
+npm run start
+```
+
 ### Lint the code using Eslint
 
 ```bash
@@ -46,12 +52,6 @@ npm run prettier
 
 ```bash
 npm run test
-```
-
-### Now that everything is set up, you can test the app by starting the server using nodemon
-
-```bash
-npm run start
 ```
 
 ### sample tests
