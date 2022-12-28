@@ -35,6 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.resizeImage = void 0;
 const sharp_1 = __importDefault(require("sharp"));
 const fs_1 = __importStar(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -61,7 +62,7 @@ const imageMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         try {
             yield fs_1.promises.access(orImageFilePath, fs_1.default.constants.F_OK);
             // The original image exists, so resize it using the "sharp" library
-            yield resizeImage(filename, width, height, res);
+            yield (0, exports.resizeImage)(filename, width, height, res);
         }
         catch (error) {
             // The original image does not exist, so return an error to the client
@@ -70,7 +71,6 @@ const imageMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     }
 });
 const resizeImage = (filename, imageWidth, imageHeight, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('Here we go');
     const filePath = `${__dirname}/../images/full/${filename}.jpg`;
     const resizedFilePath = `${__dirname}/../images/thumb/${filename}_${imageWidth}x${imageHeight}.jpg`;
     //use sharp library to resize the image
@@ -89,4 +89,5 @@ const resizeImage = (filename, imageWidth, imageHeight, res) => __awaiter(void 0
         throw new Error('Image was not resized');
     }
 });
+exports.resizeImage = resizeImage;
 exports.default = imageMiddleware;

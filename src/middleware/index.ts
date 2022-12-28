@@ -41,13 +41,12 @@ const imageMiddleware = async (
   }
 };
 
-const resizeImage = async (
+export const resizeImage = async (
   filename: string,
   imageWidth: number,
   imageHeight: number,
   res: Response
 ) => {
-  console.log('Here we go');
   const filePath: string = `${__dirname}/../images/full/${filename}.jpg`;
   const resizedFilePath: string = `${__dirname}/../images/thumb/${filename}_${imageWidth}x${imageHeight}.jpg`;
 
@@ -57,6 +56,7 @@ const resizeImage = async (
       .resize(imageWidth / 1, imageHeight / 1)
       .jpeg()
       .toBuffer();
+
     // Save the resized image to the "images/thumb" folder
     await fsPromises.writeFile(resizedFilePath, outputBuffer);
 

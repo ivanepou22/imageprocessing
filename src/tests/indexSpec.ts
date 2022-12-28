@@ -1,7 +1,12 @@
 import { promises as fsPromises } from 'fs';
 import imageMiddleware from '../middleware';
+import supertest from 'supertest';
+import app from '../index';
 
-describe('imageMiddleware', () => {
+//write end point test with jasmine
+const request = supertest(app);
+
+describe('Process the Images', () => {
   it('should send the resized image if it exists in the "images/thumb" folder', async () => {
     // Mock the request object
     const req: any = {
