@@ -54,7 +54,16 @@ npm run prettier
 npm run test
 ```
 
+### For successful tests
+
+Please place the images folder in both the dist directory and src.
+
 ### sample tests
 
-1. should send the resized image if it exists in the "images/thumb" folder.
-2. should send a 404 error if the original image does not exist in the "images/full" folder.
+1.Image Middleware
+√ 1.1: Should return a 404 status code and error message if the requested image is not found
+√ 1.2: Should send the requested image to the client if it is found in the "images/thumb" folder
+
+2.Image Processing
+√ 2.1 Expect resizeImage function to not throw an error
+√ 2.2 Expect resizeImage function to throw an error
