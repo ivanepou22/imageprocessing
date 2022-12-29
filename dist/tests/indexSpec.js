@@ -25,13 +25,13 @@ describe('Process the Images', () => {
             query: {
                 width: 200,
                 height: 200,
-                filename: 'fjord',
-            },
+                filename: 'fjord'
+            }
         };
         // Mock the response object
         const res = {
             sendFile: jasmine.createSpy(),
-            status: jasmine.createSpy(),
+            status: jasmine.createSpy()
         };
         // Mock the next function
         const next = jasmine.createSpy();
@@ -50,13 +50,13 @@ describe('Process the Images', () => {
             query: {
                 width: 200,
                 height: 200,
-                filename: 'test_image',
-            },
+                filename: 'test_image'
+            }
         };
         // Mock the response object
         const res = {
             sendFile: jasmine.createSpy(),
-            status: jasmine.createSpy(),
+            status: jasmine.createSpy()
         };
         // Mock the next function
         const next = jasmine.createSpy();
@@ -70,12 +70,3 @@ describe('Process the Images', () => {
         expect(res.status).toHaveBeenCalledWith(404);
     }));
 });
-it('Gets the Api End point', () => __awaiter(void 0, void 0, void 0, function* () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-    const response = yield request.get('/api/v1/images').query({
-        filename: 'encenadaporth',
-        width: 200,
-        height: 200,
-    });
-    expect(response.status).toBe(200);
-}));

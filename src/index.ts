@@ -5,7 +5,7 @@ const app = express();
 const port = process.env.SERVER_PORT || 5000;
 //routing
 
-app.use("/api/v1", routes);
+app.use('/api/v1', routes);
 
 app.listen(port, () => {
   console.log(`Listening on port: ${port}`);

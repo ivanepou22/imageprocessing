@@ -13,13 +13,13 @@ describe('Process the Images', () => {
       query: {
         width: 200,
         height: 200,
-        filename: 'fjord',
-      },
+        filename: 'fjord'
+      }
     };
     // Mock the response object
     const res: any = {
       sendFile: jasmine.createSpy(),
-      status: jasmine.createSpy(),
+      status: jasmine.createSpy()
     };
 
     // Mock the next function
@@ -44,13 +44,13 @@ describe('Process the Images', () => {
       query: {
         width: 200,
         height: 200,
-        filename: 'test_image',
-      },
+        filename: 'test_image'
+      }
     };
     // Mock the response object
     const res: any = {
       sendFile: jasmine.createSpy(),
-      status: jasmine.createSpy(),
+      status: jasmine.createSpy()
     };
 
     // Mock the next function
