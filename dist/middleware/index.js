@@ -53,7 +53,9 @@ const imageMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         // The image exists, so send it back to the client as a response
         res.sendFile(path_1.default.resolve(thumbImageFilePath), (err) => {
             if (err) {
-                throw new Error('Server cannot serve you at the moment try again later');
+                res
+                    .status(401)
+                    .send('Server cannot serve you at the moment try again later');
             }
         });
     }
@@ -62,31 +64,29 @@ const imageMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         try {
             yield fs_1.promises.access(orImageFilePath, fs_1.default.constants.F_OK);
             // The original image exists, so resize it using the "sharp" library
-            yield (0, exports.resizeImage)(filename, width, height, res);
+            yield (0, exports.resizeImage)(filename, width, height);
+            res.status(200).sendFile(thumbImageFilePath);
         }
         catch (error) {
             // The original image does not exist, so return an error to the client
-            res.status(404);
+            res
+                .status(404)
+                .send('Image was not found please try again with another image name.');
         }
     }
 });
-const resizeImage = (filename, imageWidth, imageHeight, res) => __awaiter(void 0, void 0, void 0, function* () {
+const resizeImage = (filename, imageWidth, imageHeight) => __awaiter(void 0, void 0, void 0, function* () {
     const filePath = `${__dirname}/../images/full/${filename}.jpg`;
     const resizedFilePath = `${__dirname}/../images/thumb/${filename}_${imageWidth}x${imageHeight}.jpg`;
     //use sharp library to resize the image
     try {
-        const outputBuffer = yield (0, sharp_1.default)(filePath)
+        yield (0, sharp_1.default)(filePath)
             .resize(imageWidth / 1, imageHeight / 1)
             .jpeg()
-            .toBuffer();
-        // Save the resized image to the "images/thumb" folder
-        yield fs_1.promises.writeFile(resizedFilePath, outputBuffer);
-        // Set the content type and send the image back to the client as a response
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.send(outputBuffer);
+            .toFile(resizedFilePath);
     }
     catch (error) {
-        throw new Error('Image was not resized');
+        throw new Error('Image was not resized Successfully');
     }
 });
 exports.resizeImage = resizeImage;

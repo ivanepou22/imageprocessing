@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,65 +31,54 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = require("fs");
-const middleware_1 = __importDefault(require("../middleware"));
-const supertest_1 = __importDefault(require("supertest"));
-const index_1 = __importDefault(require("../index"));
-//write end point test with jasmine
-const request = (0, supertest_1.default)(index_1.default);
-describe('Process the Images', () => {
-    it('should send the resized image if it exists in the "images/thumb" folder', () => __awaiter(void 0, void 0, void 0, function* () {
-        // Mock the request object
-        const req = {
-            query: {
-                width: 200,
-                height: 200,
-                filename: 'fjord'
-            }
-        };
-        // Mock the response object
-        const res = {
-            sendFile: jasmine.createSpy(),
-            status: jasmine.createSpy()
-        };
-        // Mock the next function
-        const next = jasmine.createSpy();
-        // Spy on the fsPromises.access function
-        spyOn(fs_1.promises, 'access').and.returnValue(Promise.resolve());
-        // Call the imageMiddleware function
+const middleware_1 = __importStar(require("../middleware"));
+describe('Image Middleware', () => {
+    let req;
+    let res;
+    let next;
+    beforeEach(() => {
+        req = {};
+        res = {};
+        next = jasmine.createSpy('next');
+    });
+    it('1.1: Should return a 404 status code and error message if the requested image is not found', () => __awaiter(void 0, void 0, void 0, function* () {
+        req.query = { width: '100', height: '100', filename: 'non-existent-image' };
+        res.status = jasmine.createSpy('status').and.returnValue(res);
+        res.send = jasmine.createSpy('send');
         yield (0, middleware_1.default)(req, res, next);
-        // Expect the sendFile function to be called
-        expect(res.sendFile).toHaveBeenCalled();
-        // Expect the status function not to be called
-        expect(res.status).not.toHaveBeenCalled();
-    }));
-    it('should send a 404 error if the original image does not exist in the "images/full" folder', () => __awaiter(void 0, void 0, void 0, function* () {
-        // Mock the request object
-        const req = {
-            query: {
-                width: 200,
-                height: 200,
-                filename: 'test_image'
-            }
-        };
-        // Mock the response object
-        const res = {
-            sendFile: jasmine.createSpy(),
-            status: jasmine.createSpy()
-        };
-        // Mock the next function
-        const next = jasmine.createSpy();
-        // Spy on the fsPromises.access function and make it throw an error
-        spyOn(fs_1.promises, 'access').and.returnValue(Promise.reject(new Error()));
-        // Call the imageMiddleware function
-        yield (0, middleware_1.default)(req, res, next);
-        // Expect the sendFile function not to be called
-        expect(res.sendFile).not.toHaveBeenCalled();
-        // Expect the status function to be called with a 404 status code
         expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.send).toHaveBeenCalledWith('Image was not found please try again with another image name.');
+    }));
+    it('1.2: Should send the requested image to the client if it is found in the "images/thumb" folder', () => __awaiter(void 0, void 0, void 0, function* () {
+        req.query = { width: '200', height: '200', filename: 'fjord' };
+        res.sendFile = jasmine
+            .createSpy('sendFile')
+            .and.returnValue(Promise.resolve());
+        yield (0, middleware_1.default)(req, res, next);
+        expect(res.sendFile).toHaveBeenCalled();
+    }));
+});
+describe('Image Processing', () => {
+    it('2.1 Expect resizeImage function to not throw an error', () => __awaiter(void 0, void 0, void 0, function* () {
+        //Define the name for the image be resized
+        const imageName = `palmtunnel`;
+        //Attempt to resize the image based on the user sizes
+        yield (0, middleware_1.resizeImage)(imageName, 100, 100);
+    }));
+    it('2.2 Expect resizeImage function to throw an error', () => __awaiter(void 0, void 0, void 0, function* () {
+        //Define the path for the file to be resized
+        const filename = 'image-not-found';
+        let error;
+        try {
+            //Attempt to resize the image based on the user sizes
+            yield (0, middleware_1.resizeImage)(filename, 100, 100);
+        }
+        catch (e) {
+            error = e;
+        }
+        //Define the expected error
+        const definedError = new Error('Image was not resized Successfully');
+        expect(error).toEqual(definedError);
     }));
 });

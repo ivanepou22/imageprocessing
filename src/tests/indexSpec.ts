@@ -1,71 +1,64 @@
-import { promises as fsPromises } from 'fs';
-import imageMiddleware from '../middleware';
-import supertest from 'supertest';
-import app from '../index';
+import imageMiddleware, { resizeImage } from '../middleware';
+import { Request, Response, NextFunction } from 'express';
 
-//write end point test with jasmine
-const request = supertest(app);
+describe('Image Middleware', () => {
+  let req: Request;
+  let res: Response;
+  let next: NextFunction;
 
-describe('Process the Images', () => {
-  it('should send the resized image if it exists in the "images/thumb" folder', async () => {
-    // Mock the request object
-    const req: any = {
-      query: {
-        width: 200,
-        height: 200,
-        filename: 'fjord'
-      }
-    };
-    // Mock the response object
-    const res: any = {
-      sendFile: jasmine.createSpy(),
-      status: jasmine.createSpy()
-    };
-
-    // Mock the next function
-    const next: any = jasmine.createSpy();
-
-    // Spy on the fsPromises.access function
-    spyOn(fsPromises, 'access').and.returnValue(Promise.resolve());
-
-    // Call the imageMiddleware function
-    await imageMiddleware(req, res, next);
-
-    // Expect the sendFile function to be called
-    expect(res.sendFile).toHaveBeenCalled();
-
-    // Expect the status function not to be called
-    expect(res.status).not.toHaveBeenCalled();
+  beforeEach(() => {
+    req = {} as Request;
+    res = {} as Response;
+    next = jasmine.createSpy('next');
   });
 
-  it('should send a 404 error if the original image does not exist in the "images/full" folder', async () => {
-    // Mock the request object
-    const req: any = {
-      query: {
-        width: 200,
-        height: 200,
-        filename: 'test_image'
-      }
-    };
-    // Mock the response object
-    const res: any = {
-      sendFile: jasmine.createSpy(),
-      status: jasmine.createSpy()
-    };
+  it('1.1: Should return a 404 status code and error message if the requested image is not found', async () => {
+    req.query = { width: '100', height: '100', filename: 'non-existent-image' };
+    res.status = jasmine.createSpy('status').and.returnValue(res);
+    res.send = jasmine.createSpy('send');
 
-    // Mock the next function
-    const next: any = jasmine.createSpy();
-
-    // Spy on the fsPromises.access function and make it throw an error
-    spyOn(fsPromises, 'access').and.returnValue(Promise.reject(new Error()));
-
-    // Call the imageMiddleware function
     await imageMiddleware(req, res, next);
 
-    // Expect the sendFile function not to be called
-    expect(res.sendFile).not.toHaveBeenCalled();
-
-    // Expect the status function to be called with a 404 status code
     expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith(
+      'Image was not found please try again with another image name.'
+    );
+  });
+
+  it('1.2: Should send the requested image to the client if it is found in the "images/thumb" folder', async () => {
+    req.query = { width: '200', height: '200', filename: 'fjord' };
+    res.sendFile = jasmine
+      .createSpy('sendFile')
+      .and.returnValue(Promise.resolve());
+
+    await imageMiddleware(req, res, next);
+
+    expect(res.sendFile).toHaveBeenCalled();
+  });
+});
+
+describe('Image Processing', () => {
+  it('2.1 Expect resizeImage function to not throw an error', async (): Promise<void> => {
+    //Define the name for the image be resized
+    const imageName = `palmtunnel`;
+    //Attempt to resize the image based on the user sizes
+    await resizeImage(imageName, 100, 100);
+  });
+
+  it('2.2 Expect resizeImage function to throw an error', async (): Promise<void> => {
+    //Define the path for the file to be resized
+    const filename: string = 'image-not-found';
+
+    let error;
+
+    try {
+      //Attempt to resize the image based on the user sizes
+      await resizeImage(filename, 100, 100);
+    } catch (e) {
+      error = e;
+    }
+    //Define the expected error
+    const definedError = new Error('Image was not resized Successfully');
+    expect(error).toEqual(definedError);
   });
 });

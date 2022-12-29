@@ -2,7 +2,7 @@ import express from 'express';
 import routes from './routes';
 
 const app = express();
-const port = process.env.SERVER_PORT || 5000;
+const port = process.env.SERVER_PORT || 3000;
 //routing
 
 app.use('/api/v1', routes);
